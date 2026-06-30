@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flash Sale Engine — Big Billion Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fk-blue: #2874f0;
+    --fk-blue-dark: #1c4fb0;
+    --fk-yellow: #ffe11b;
+    --ink: #212121;
+    --bg: #f1f3f6;
+    --card: #ffffff;
+    --line: #e7eaf0;
+    --muted: #6b7280;
+    --green: #388e3c;
+    --green-soft: #e6f4e8;
+    --red: #d32f2f;
+    --red-soft: #fce9e9;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+
+  /* ---------- Header ---------- */
+  header {
+    background: linear-gradient(90deg, var(--fk-blue), var(--fk-blue-dark));
+    padding: 14px 40px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  }
+  .logo {
+    color: white;
+    font-weight: 800;
+    font-size: 21px;
+    font-style: italic;
+    letter-spacing: -0.01em;
+  }
+  .logo-sub {
+    color: #c7dbfc;
+    font-size: 11px;
+    font-weight: 500;
+    margin-top: 1px;
+  }
+  .logo-wrap { display: flex; flex-direction: column; line-height: 1.1; }
+  .header-divider { width: 1px; height: 28px; background: rgba(255,255,255,0.25); }
+  .header-title { color: white; font-size: 14px; font-weight: 600; }
+  .live-pill {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--fk-yellow);
+    color: #5c4400;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 6px 14px;
+    border-radius: 4px;
+    letter-spacing: 0.02em;
+  }
+  .live-dot {
+    width: 7px; height: 7px;
+    background: #c0392b;
+    border-radius: 50%;
+    animation: blink 1.3s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* ---------- Hero strip ---------- */
+  .hero {
+    background: linear-gradient(135deg, var(--fk-blue) 0%, #1a3f8f 100%);
+    padding: 36px 40px 44px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 260px; height: 260px;
+    background: var(--fk-yellow);
+    opacity: 0.08;
+    border-radius: 50%;
+  }
+  .hero-eyebrow {
+    color: var(--fk-yellow);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .hero h1 {
+    color: white;
+    font-size: clamp(26px, 3.6vw, 38px);
+    font-weight: 800;
+    line-height: 1.15;
+    max-width: 640px;
+    letter-spacing: -0.01em;
+  }
+  .hero p {
+    color: #d6e3fb;
+    margin-top: 12px;
+    font-size: 14.5px;
+    max-width: 520px;
+    line-height: 1.6;
+  }
+
+  /* ---------- Body ---------- */
+  .wrap { max-width: 1180px; margin: -28px auto 0; padding: 0 40px 48px; position: relative; }
+
+  .top-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    gap: 20px;
+  }
+  @media (max-width: 920px) { .top-grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+  }
+
+  /* ---------- Stock meter card ---------- */
+  .meter-card { padding: 26px 28px; }
+  .meter-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .meter-label { font-size: 12px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+  .meter-of { font-size: 12px; color: var(--muted); }
+  .meter-count-row { display: flex; align-items: baseline; gap: 10px; margin-bottom: 18px; }
+  .meter-count {
+    font-size: 52px;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--fk-blue);
+    transition: color 0.3s;
+  }
+  .meter-count.danger { color: var(--red); }
+  .meter-unit { font-size: 14px; color: var(--muted); font-weight: 500; }
+
+  .meter-track {
+    height: 22px;
+    background: #eef1f6;
+    border-radius: 6px;
+    overflow: hidden;
+  }
+  .meter-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--fk-blue), #4d8df5);
+    border-radius: 6px;
+    transition: width 0.6s cubic-bezier(.4,0,.2,1), background 0.3s;
+  }
+  .meter-fill.danger { background: linear-gradient(90deg, var(--red), #e25c52); }
+  .meter-foot { display: flex; justify-content: space-between; margin-top: 9px; font-size: 12px; color: var(--muted); }
+  .meter-foot .pct { font-weight: 600; color: var(--ink); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-top: 16px; }
+  .stat { padding: 16px 14px; text-align: left; }
+  .stat-num { font-size: 24px; font-weight: 800; }
+  .stat-label { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 500; }
+  .stat.ok .stat-num { color: var(--green); }
+  .stat.no .stat-num { color: var(--red); }
+  .stat.q .stat-num { color: var(--fk-blue); }
+
+  /* ---------- Action card ---------- */
+  .action-card { padding: 28px; display: flex; flex-direction: column; }
+  .action-card h2 { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
+  .action-card .sub { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+
+  .field-row { display: flex; gap: 10px; margin-bottom: 16px; }
+  input[type=text] {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  input[type=text]:focus { border-color: var(--fk-blue); }
+  input[type=text]::placeholder { color: #b3b9c4; }
+
+  button { font-family: 'Inter', sans-serif; cursor: pointer; border: none; }
+  .btn-register {
+    padding: 12px 22px;
+    background: var(--fk-blue);
+    color: white;
+    font-weight: 700;
+    font-size: 13px;
+    border-radius: 4px;
+    transition: background 0.15s;
+  }
+  .btn-register:hover { background: var(--fk-blue-dark); }
+
+  .btn-buy {
+    margin-top: auto;
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(90deg, #fb641b, #ff9f00);
+    color: white;
+    font-weight: 700;
+    font-size: 15px;
+    border-radius: 4px;
+    letter-spacing: 0.01em;
+    transition: filter 0.15s, transform 0.1s;
+  }
+  .btn-buy:hover:not(:disabled) { filter: brightness(1.06); }
+  .btn-buy:active:not(:disabled) { transform: translateY(1px); }
+  .btn-buy:disabled { background: #d9dde3; color: #9aa1ad; cursor: not-allowed; }
+
+  /* ---------- History ---------- */
+  .history-card { margin-top: 20px; padding: 24px 28px 8px; }
+  .history-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .history-head h2 { font-size: 17px; font-weight: 700; }
+  .refresh {
+    font-size: 12px;
+    color: var(--fk-blue);
+    background: none;
+    border: 1px solid var(--fk-blue);
+    padding: 6px 13px;
+    border-radius: 4px;
+    font-weight: 600;
+  }
+  .refresh:hover { background: #eaf1fe; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--muted);
+    font-weight: 700;
+    padding: 0 0 10px;
+    border-bottom: 2px solid var(--line);
+  }
+  tbody td { padding: 13px 0; font-size: 13.5px; border-bottom: 1px solid #f1f3f6; }
+  tbody tr:last-child td { border-bottom: none; }
+  .uid { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+  .oid { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted); }
+
+  .tag {
+    display: inline-block;
+    padding: 3px 11px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .tag.ok { background: var(--green-soft); color: var(--green); }
+  .tag.no { background: var(--red-soft); color: var(--red); }
+  .tag.pending { background: #eaf1fe; color: var(--fk-blue); }
+
+  .empty { text-align: center; padding: 46px 0; color: var(--muted); font-size: 13px; }
+
+  /* ---------- Toast ---------- */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: var(--ink);
+    color: white;
+    padding: 13px 20px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(.4,0,.2,1);
+    z-index: 999;
+    max-width: 320px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.ok { background: var(--green); }
+  .toast.no { background: var(--red); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-wrap">
+    <span class="logo">Flipkart</span>
+    <span class="logo-sub">Engineering Sandbox</span>
+  </div>
+  <div class="header-divider"></div>
+  <span class="header-title">Flash Sale Engine</span>
+  <div class="live-pill"><span class="live-dot"></span>BIG BILLION DAYS — LIVE</div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">Concurrency stress test</div>
+  <h1>100 units. Unlimited demand.<br>Zero overselling, guaranteed.</h1>
+  <p>A thread-safe inventory engine built in Java + Spring Boot, persisted to MongoDB. Every purchase attempt is processed atomically — race conditions are mathematically impossible.</p>
+</div>
+
+<div class="wrap">
+  <div class="top-grid">
+    <div class="card meter-card">
+      <div class="meter-top">
+        <span class="meter-label">Stock remaining</span>
+        <span class="meter-of">of 100 units</span>
+      </div>
+      <div class="meter-count-row">
+        <span class="meter-count" id="stockCount">—</span>
+        <span class="meter-unit">units left</span>
+      </div>
+      <div class="meter-track"><div class="meter-fill" id="meterFill" style="width:100%"></div></div>
+      <div class="meter-foot">
+        <span id="meterStatus">Sale active</span>
+        <span class="pct mono" id="meterPct">100%</span>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat ok"><div class="stat-num" id="successCount">—</div><div class="stat-label">Fulfilled</div></div>
+        <div class="stat no"><div class="stat-num" id="soldOutCount">—</div><div class="stat-label">Sold out</div></div>
+        <div class="stat q"><div class="stat-num" id="queueCount">—</div><div class="stat-label">In queue</div></div>
+      </div>
+    </div>
+
+    <div class="card action-card">
+      <h2>Join the queue</h2>
+      <div class="sub">Register a user ID, then trigger a purchase attempt against live inventory.</div>
+
+      <div class="field-row">
+        <input type="text" id="userIdInput" placeholder="user_id — e.g. user_4821" />
+        <button class="btn-register" onclick="registerUser()">Register</button>
+      </div>
+
+      <button class="btn-buy" onclick="buyItem()">
+        <span id="buyLabel">⚡ Attempt Purchase</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card history-card">
+    <div class="history-head">
+      <h2>Order ledger</h2>
+      <button class="refresh" onclick="loadHistory()">Refresh</button>
+    </div>
+    <table>
+      <thead><tr><th>User</th><th>Result</th><th>Order ID</th></tr></thead>
+      <tbody id="historyBody">
+        <tr><td colspan="3" class="empty">No orders yet — register a user and attempt a purchase.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const API = window.location.origin;
+
+  function showToast(msg, type) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast show ${type || ''}`;
+    setTimeout(() => t.className = 'toast', 2800);
+  }
+
+  async function loadStats() {
+    try {
+      const res = await fetch(`${API}/sale/stats`);
+      const d = await res.json();
+      const stock = d.stockRemaining;
+      const pct = Math.max(0, Math.min(100, (stock / 100) * 100));
+      const danger = stock <= 15;
+
+      const countEl = document.getElementById('stockCount');
+      countEl.textContent = stock;
+      countEl.classList.toggle('danger', danger);
+
+      const fillEl = document.getElementById('meterFill');
+      fillEl.style.width = pct + '%';
+      fillEl.classList.toggle('danger', danger);
+
+      document.getElementById('meterPct').textContent = Math.round(pct) + '%';
+      document.getElementById('meterStatus').textContent = stock === 0 ? 'Sold out' : 'Sale active';
+
+      document.getElementById('successCount').textContent = d.successOrders;
+      document.getElementById('soldOutCount').textContent = d.soldOutOrders;
+    } catch (e) { console.error(e); }
+  }
+
+  async function loadStatus() {
+    try {
+      const res = await fetch(`${API}/sale/status`);
+      const d = await res.json();
+      document.getElementById('queueCount').textContent = d.usersInQueue;
+    } catch (e) {}
+  }
+
+  async function registerUser() {
+    const input = document.getElementById('userIdInput');
+    const userId = input.value.trim();
+    if (!userId) { showToast('Enter a user ID first', 'no'); return; }
+    try {
+      const res = await fetch(`${API}/sale/register/${userId}`, { method: 'POST' });
+      const d = await res.json();
+      showToast(d.message, 'ok');
+      input.value = '';
+      loadStatus();
+    } catch (e) { showToast('Could not reach server', 'no'); }
+  }
+
+  async function buyItem() {
+    const btn = document.querySelector('.btn-buy');
+    const label = document.getElementById('buyLabel');
+    btn.disabled = true;
+    label.textContent = 'Processing…';
+    try {
+      const res = await fetch(`${API}/sale/buy`, { method: 'POST' });
+      const d = await res.json();
+      if (d.status === 'SUCCESS') showToast(`${d.userId} secured the item — ${d.stockLeft} left`, 'ok');
+      else if (d.status === 'SOLD_OUT') showToast(`${d.userId} missed it — sold out`, 'no');
+      else showToast(d.message || 'Queue is empty', '');
+      loadStats(); loadHistory();
+    } catch (e) { showToast('Could not reach server', 'no'); }
+    btn.disabled = false;
+    label.textContent = '⚡ Attempt Purchase';
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch(`${API}/sale/history`);
+      const orders = await res.json();
+      const body = document.getElementById('historyBody');
+      if (!orders.length) {
+        body.innerHTML = '<tr><td colspan="3" class="empty">No orders yet — register a user and attempt a purchase.</td></tr>';
+        return;
+      }
+      body.innerHTML = orders.reverse().map(o => `
+        <tr>
+          <td class="uid">${o.userId}</td>
+          <td><span class="tag ${o.status === 'SUCCESS' ? 'ok' : o.status === 'SOLD_OUT' ? 'no' : 'pending'}">${o.status}</span></td>
+          <td class="oid">${o.id || '—'}</td>
+        </tr>
+      `).join('');
+    } catch (e) {}
+  }
+
+  loadStats(); loadStatus(); loadHistory();
+  setInterval(() => { loadStats(); loadStatus(); }, 5000);
+</script>
+
+</body>
+</html>
